@@ -143,12 +143,3 @@ plt.show()
 ```
 
 ---
-
-## ✅ Summary
-- Fourier Transform → แปลงภาพจาก spatial → frequency domain  
-- DFT ใช้กับภาพ digital, คำนวณด้วย FFT ได้เร็วขึ้น  
-- Filtering:  
-  - LPF → blur, noise reduction  
-  - HPF → edge enhancement  
-- Spatial filtering = convolution, Frequency filtering = multiplication  
-- Frequency domain filtering เหมาะกับภาพใหญ่ + ใช้ filter เชิงทฤษฎีได้ง่ายกว่า  

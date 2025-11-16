@@ -19,10 +19,10 @@
 
 **Formula**:  
 - Image f มี gray levels = 0,…,L-1  
-- Histogram: `h(r_k) = n_k` (จำนวน pixel ที่ intensity = r_k)  
-- Normalized Histogram: `p(r_k) = n_k / n`  
+- Histogram: $h(r_k) = n_k$ (จำนวน pixel ที่ intensity = $r_k$)  
+- Normalized Histogram: $p(r_k) = \frac{n_k}{n}$  
   - เป็น estimate ของ probability  
-  - Σp(r_k) = 1  
+  - $Σp(r_k)$ = 1  
 
 ---
 
@@ -46,7 +46,11 @@
   4. ใช้ CDF mapping ใหม่  
   5. Interpolation รวมกลับมาเป็นภาพเดียว  
 
-→ ใช้ใน medical imaging, low-light enhancement  
+→ ใช้ใน medical imaging, low-light enhancement
+
+HE: global, risk of over-contrast, bad for uneven lighting.
+
+CLAHE: local, preserves local contrast, better for medical images, textures, and images with varying illumination.
 
 ---
 

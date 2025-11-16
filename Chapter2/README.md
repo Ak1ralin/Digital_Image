@@ -52,6 +52,8 @@
   - **Hue (Dominant Wavelength)** : Chromatic component
   - **Saturation (Amount of white light)** : Chromatic component
   - Hue and Saturation : **Chromaticity** 
+
+#### How to represent color
 - **CIE Chromaticity Diagram** → standard color representation.
   - z = 1 - (x + y) , x = red , y = green
 - **Tristimulus** : Amount of red, green and blue to form color
@@ -61,14 +63,16 @@
 
 ### 4. Color Models
 - **RGB**: additive, displays/screens.  
+  - All color normalised to [0,1], 0 is black 1 is white
+  - Additive = light mixing → white when maxed
 - **CMY/CMYK**: subtractive, printing. Secondary Color of light
+  - Subtractive = pigment/ink mixing → black when maxed
 - **HSI/HSV**: separates hue, saturation, intensity – aligns with human perception. close to how human interpret colors, ideal tool for image processing algorithm.
   - Hue : pure color
   - Saturation : degree hue diluted by white light
   - Brightness : Intensity
 - **Gray** = 0.3R + 0.6G + 0.11B
-
-- **L\*a\*b\***: device-independent, L* = lightness, a* = green-red, b* = blue-yellow.
+- **L\*a\*b\***/CIELAB model: device-independent, L* = lightness, a* = green-red, b* = blue-yellow.
 
 ---
 
@@ -82,15 +86,15 @@
 
   `g(x,y) = af(x,y)+ b`
 - **Gray-Level Transformations**: Image Enhancement
-  1. Negative transformation `s = (L-1) - r` 0 -> 255, 255 - 0
-  2. Log transformation (expand dark regions) `s = clog(1+r)` 
+  1. Negative transformation `s = (L-1) - r` 0 -> 255 , 255 -> 0
+  2. Log transformation (expand dark regions) `s = clog(1+r)`, r = normalised intensity
       - log0 ไม่มีค่า so + 1
       - log ทำให้ค่าลดลง -> brighter
   3. Power-law (gamma correction)  $s = cr^Y$ 
       - c, Y = positive constant
       - Y > 1 Brighter, Y < 1 Darker
       - ใช้กับ MRI Y = 0.4,0.6 more detailed becomes visible 
-  4. Piecewise-linear (contrast stretching) ไม่ได้ใช้ function เดียยวสำหรับทุก intensity แต่มีหลายฟังก์ชั่นแยกเป็น range
+  4. Piecewise-linear (contrast stretching) ไม่ได้ใช้ function เดียวสำหรับทุก intensity แต่มีหลายฟังก์ชั่นแยกเป็น range
   5. Gray-level slicing : เอาเฉพาะ intensity บางส่วนที่ interest ส่วนอื่นให้มันหลายเป็น 0 หรือคงค่าเดิมไรงี้ เป็น Piecewise-linear แบบหนึ่ง 
   6. Bit-plane slicing : แยกตาม bit เอาเฉพาะบาง bit (MSB) -> image compression 
 
@@ -99,6 +103,11 @@
   - Averaging → noise reduction (astronomy). เอาหลายๆ รูปมา avg เพื่อลด noise 
   - AND/OR masking → select ROIs (Region of interest).
 
+- **Interpolation**:
+  - Nearest Neighboring : Just pick a nearest one, so blocky.
+  - Linear : Averaging so smooth but blurry transition
+  - Bicubic : Averaging but also fit with polynomial curve, so might have exceed.
+  - Area : Nearest + Averaging
 ---
 
 ## 🐍 Python Exercises

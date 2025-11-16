@@ -42,9 +42,9 @@
 ---
 
 ## ⚡ Challenges in Computer Vision
-- Point of view, illumination, scale ทำให้สิ่งเดียวกันดูต่างในมุมของรูป
-- Deformation, occlusion, background clutter 
-- Ambiguity, motion, intra-class variations (รูปทรงต่างแต่เป็นเก้าอี้เหมือนกัน)
+- Point of view, illumination (light change color), scale (size) ทำให้สิ่งเดียวกันดูต่างในมุมของรูป
+- Deformation, occlusion (blocking), background clutter 
+- Ambiguity (blur), motion, intra-class variations (รูปทรงต่างแต่เป็นเก้าอี้เหมือนกัน)
 
 These make tasks like object recognition or segmentation difficult compared to human perception.
 
