@@ -59,7 +59,7 @@
 
 มีสอง network เล่นเกมกัน:
 
-- **Generator G(z)** – Decoder, รับ noise z → สร้างภาพปลอม, คล้าย VAE
+- **Generator G(z)** – Decoder, รับ noise z (Gaussian Space) → สร้างภาพปลอม, คล้าย VAE
 - **Discriminator D(x)** – Encoder, ดูว่าภาพเป็น real(จาก data) หรือ fake(จาก G), classification model
 
 ### Training
@@ -71,7 +71,7 @@
 D(x) ใช้ loss ส่วนใหญ่เป็น **binary cross-entropy**
 
 ### ใช้ทำอะไร
-
+- ส่วนใหญ่ใช้ Conditional GAN ทำ
 - สร้าง “สิ่งที่ไม่เคยมีอยู่จริง”
   - face synthesis, style transfer, image-to-image, inpainting
   - restoration, super-resolution ฯลฯ
@@ -85,7 +85,8 @@ D(x) ใช้ loss ส่วนใหญ่เป็น **binary cross-entropy*
 
 ---
 
-## DCGAN – Architectures
+## DCGAN (Deep Convolution GAN)
+ก็แค่เปลี่ยนให้ model ใช้ Convolution แทน
 
 ### Generator
 
@@ -108,7 +109,7 @@ D(x) ใช้ loss ส่วนใหญ่เป็น **binary cross-entropy*
 - เลเยอร์สุดท้ายให้ scalar probability ผ่าน Sigmoid
 
 ### Training loop (โดยย่อ)
-
+Train สลับ D -> G -> D
 1. อัปเดต D:
     - ใช้ real images (label=1) → loss_real
     - ใช้ fake จาก G(z) (label=0) → loss_fake
@@ -117,8 +118,6 @@ D(x) ใช้ loss ส่วนใหญ่เป็น **binary cross-entropy*
     - สร้าง fake ใหม่จาก noise
     - ป้อนเข้า D แต่ใช้ label=1 (อยากให้ D คิดว่าเป็น real)
     - ได้ `errG` → backward + `optimizerG.step()`
-
-สไลด์มีตัวอย่าง **real cat faces vs fake cat faces** จาก DCGAN
 
 ---
 
@@ -136,23 +135,13 @@ D(x) ใช้ loss ส่วนใหญ่เป็น **binary cross-entropy*
 - ทำให้ควบคุมสิ่งที่ generate ได้ เช่น “แมว”, “หมา”, “รองเท้า”
 
 ### Pix2Pix – Image-to-Image Translation
-
-โจทย์: มีคู่ภาพ (xA, xB) เช่น
-
-- segmentation mask → ภาพจริง
-- แผนที่ ↔ aerial photo
-- sketch → photo
-- B/W → color
-- รูปที่ mask ทิ้งบางส่วน → inpaint ภาพเต็ม
-
-หลัก ๆ:
+- xA (input image), xB (Original, Expected Result), G(xA) : predicted image
 
 - ใช้ **PatchGAN discriminator**:
-  - D ให้ output map ของ patch-scale “real/fake” แทน scalar เดียว
-  - เน้น local realism (texture, edge) มาก
-- Loss = **GAN loss + λ · L1 loss**:
+  - D ให้ D(xA,G(xA)) สำหรับ Generator, D(xA,xB) สำหรับ improve discriminator
+  - PatchGAN มีการแยกเป็นส่วนๆ ทำให้รู้ว่าส่วนไหนดู real/fake แค่ไหน 
+- Loss for Generator = **GAN loss + λ · ||xB - G(xA)||**:
   - GAN loss: ให้ภาพดู real
-  - L1(xB, G(xA)): ให้ผลลัพธ์ใกล้ target pixel-wise, ลด blur (L1 ดีกว่า L2 สำหรับรายละเอียดภาพ)
 
 ---
 
@@ -171,6 +160,7 @@ D(x) ใช้ loss ส่วนใหญ่เป็น **binary cross-entropy*
 ## Diffusion Models – DDPM
 
 ### Concept หลัก
+- เป็น Parametric Markov Chain -> Iterative Process
 
 มีสองขั้นตอน:
 
@@ -178,29 +168,29 @@ D(x) ใช้ loss ส่วนใหญ่เป็น **binary cross-entropy*
     - เริ่มจากภาพจริง \(x_0\)
     - ค่อย ๆ เติม Gaussian noise ได้ \(x_1, x_2, ..., x_T\)
     - สุดท้าย \(x_T\) จะกลายเป็น noise เกือบสมบูรณ์แบบ (high entropy)
+    $$x_n = x_{n-1} + ε_{n-1}$$
 2. **Reverse (denoising) process**
     - เริ่มจาก noise \(x_T\)
-    - ค่อย ๆ ใช้ model (เช่น U-Net) ทำนายและลบ noise ทีละ step
+    - ค่อย ๆ ใช้ model (เช่น U-Net) ทำนาย
+    $$x_{n-1} = x_n - ε_{n-1}$$
+    - U-Net ใช้ $x_n$ มาทำนาย $ε_{n-1}$ แล้วลบมันออก
+    - ใช้ **MSE loss** ระหว่าง real_noise vs pred_noise -> ทำ improve ความสามารถในการ predict noise จาก x_n
     - ไปจนถึง \(x_0\) → เป็นภาพใหม่ที่ sample มาจาก data distribution
-
-### การ train
-
-- ให้ model รับ (x_t, t) และ predict noise ε ที่ถูกเติมใน step นั้น
-- ใช้ **MSE loss** ระหว่าง noise จริง vs noise ที่โมเดลทำนาย
-- สุ่ม t หลาย ๆ level → โมเดลเรียนรู้การ denoise ทุกระดับ noise
 
 ---
 
 ## Latent Diffusion & Stable Diffusion
 
 **Stable Diffusion** ใช้ไอเดีย **Latent Diffusion Model (LDM)**:
+- **Key Concept : เพิ่ม noise ใน latent**
 
-- ใช้ autoencoder บีบภาพให้เป็น latent z
+Step : 
+- ใช้ encoder บีบภาพให้เป็น latent z
 - ทำ diffusion ใน latent space แทน pixel space
   - ลดความซับซ้อน, ประหยัด compute
-- ใช้ U-Net เป็น core denoiser
-- ใส่ text condition ผ่าน text encoder (เช่น Transformer) + cross-attention
-  → ได้ text-to-image ที่ powerful และยังรันบน GPU ปกติได้
+- ใช้ U-Net เป็น core denoiser : เหมือนเดิม
+  - ใส่ text condition ผ่าน text encoder (เช่น Transformer) + cross-attention
+- ได้ latent จาก U-net ผ่าน decoder -> เป็นภาพ
 
 ---
 
@@ -218,21 +208,6 @@ D(x) ใช้ loss ส่วนใหญ่เป็น **binary cross-entropy*
 แนววิจัยใหม่ ๆ เลยพยายาม:
 - ทำ diffusion ให้ “few-step / one-step” เข้าใกล้ความเร็ว GAN
 - หรือ hybrid แนว diffusion+GAN
-
----
-
-## Future Directions (จาก slide)
-
-- **Few-step / one-step generation**
-  - ลดจำนวน step ใน reverse process
-- **Efficient architectures**
-  - ปรับ backbone / top-layers ให้เบาแต่คุณภาพดี
-- **Complex lighting / shadows**
-  - ให้โมเดล handle แสงเงาซับซ้อนได้ดีขึ้น
-- **Robust editing**
-  - ปรับแก้ภาพโดยไม่ทำลาย context อื่น ๆ
-- **Better evaluation metrics**
-  - อยากได้ metric ที่ดู semantic similarity มากกว่า pixel error (PSNR/SSIM)
 
 ---
 
