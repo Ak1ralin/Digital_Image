@@ -2,7 +2,7 @@
 
 ## Big Picture
 
-- ต่อจาก Lecture 8 แต่โฟกัสที่ **modern image segmentation ด้วย Deep Learning**
+- ต่อจาก Image Segmentation I แต่โฟกัสที่ **modern image segmentation ด้วย Deep Learning**
 - เข้าใจ
     - ประเภท segmentation (semantic / instance / panoptic)
     - metric วัดผล (IoU, Dice, Pixel Acc, Precision/Recall, F1)
@@ -25,6 +25,7 @@
         - class ของ pixel (semantic)
         - id ของ instance (instance)
 
+![SegmentType](Images/SegmentType.png)
 ---
 
 ## Metrics สำหรับ Segmentation
@@ -43,14 +44,14 @@
 - ในงาน segmentation มักใช้ **Dice loss = 1 – Dice score**  
   → บังคับให้ mask ทับกันเยอะ ๆ
 
-**ทั้ง IoU และ Dice สุดท้ายจะใช้เป็น mean ของการกำหนด class เป็น Positive, หรือเอาเฉพาะอันที่สนใจเช่น object = positive**
+**ทั้ง IoU และ Dice สุดท้ายจะใช้เป็น mean ของทุก class, โดยกำหนด each class เป็น Positive, หรือเอาเฉพาะอันที่สนใจเช่น object = positive**
 ### Pixel Accuracy / Precision / Recall / F1
 
 - **Pixel accuracy (Acc)** = จำนวน pixel ที่ทายถูก / pixel ทั้งหมด 
     - แต่ถ้า class imbalance (BG เยอะ) → Acc สูงแต่ไม่ได้ดี
 - ใช้ **Precision / Recall / F1** ต่อ class แล้ว
     - Macro-F1 = average ระหว่าง class (ทุก class สำคัญเท่ากัน) บวกแล้วหารด้วยจำนวน class
-    - Micro-F1 = นับรวมทุก pixel ก่อนคำนวณ (class ใหญ่มีน้ำหนักเยอะ) คูณด้วย pixel บวกแล้วหารด้วยจำนวน pixel
+    - Micro-F1 = ขึ้นกับจำนวน pixel ของ class (class ใหญ่มีน้ำหนักเยอะ) คูณด้วย pixel บวกแล้วหารด้วยจำนวน pixel
 
 ---
 
@@ -66,11 +67,16 @@
         - FCN-16s : เอา A -> 2x2 ก่อน เอามาบวกกับ 2x2 ของตอน encoder (skip connection) ได้ 2x2 (B) -> 32x32
         - FCN-8s  : เอา B -> 4x4 ก่อน เอามาบวกกับ 4x4 ของตอน encoder (skip connection) ได้ 4x4 -> 32x32
         - Result : 8s > 16s > 32s
-- **Transposed convolution** : ทำงานยังไงดู pg.17
+
+        ![FCN](Images/FCN.png)
+
+- **Transposed convolution** : 
     - มี parameter: kernel size, stride, padding
     - มองได้เหมือน “inverse” ของ conv ปกติ
     - ใช้ stride > 1 เพื่อ upsample feature map
     - padding -> คือตัดขอบของ result ออก
+    
+    ![TConV](Images/TConV.png)
 ---
 
 ## U-Net
@@ -80,6 +86,7 @@
     - มี **skip connection** เอา feature จาก encoder มาต่อ (concat) กับ decoder  
       → ช่วยให้เก็บ fine details (boundary)
 
+    ![Unet](Images/Unet.png)
 ---
 
 ## Loss Functions for Segmentation
@@ -102,16 +109,23 @@
 - Dense Coord-Convolution Network (DCNN) : เพิ่ม Coordinate (x,y) ลงใน input 
 - Atrous conv:
     - ใส่ “ช่องว่าง” ใน kernel → receptive field ใหญ่ขึ้น
-    - ไม่ต้องเพิ่ม kernel size และไม่ต้อง down-sampling 
+    - ไม่ต้องเพิ่ม kernel size และไม่ต้อง down-sampling
+
+    ![AtrousConV](Images/AtrousConV.png) 
+
 - Output feature map upsample กลับไปขนาดภาพเดิมด้วย bilinear interpolation -> ไวและไม่ต้อง Train เหมือน TransposeConvo
 - ใช้ **fully connected CRF (Conditional Random)** ช่วย refine ขอบ object ให้คมขึ้น
-    - เป็น discriminative model → สนใจตรง ๆ เลยว่า
-ถ้าเห็น input แบบนี้ อยากให้ label ออกมาเป็นอะไร
+    - เป็น discriminative model → สนใจตรง ๆ เลยว่า ถ้าเห็น input แบบนี้ อยากให้ label ออกมาเป็นอะไร
+    
+    ![DeepLabV1](Images/DeepLabV1.png)
+
 ### DeepLab v2 – ASPP (Atrous Spatial Pyramid Pooling)
 
 - ใช้ **หลาย ๆ atrous conv ขนาดเท่ากัน แต่ dilation rate ต่างกัน** ทำงานขนานกัน
 - เพิ่ม Global Average Pooling (context ใหญ่ ๆ) แล้ว upsample
 - Concatenate ทุก branch ตาม channel dimension → ได้ feature รวมหลาย scale
+
+![DeepLabV2](Images/DeepLabV2.png)
 
 ### DeepLab v3 / v3+
 
@@ -133,7 +147,14 @@
         - 1×1 conv เพื่อ mix channels และกำหนดจำนวน output channels
 - เทียบจำนวน parameters:
     - Standard conv: `in_c * out_c * k * k` (เช่น 3x5x5x32 = 2400)
+
+    ![StandardConV](Images/StandardConV.png)
     - Depth-wise + 1×1: `(in_c * k * k) + (in_c * out_c)` (75+96=171)
+
+    ![DepthWiseConV](Images/DepthWiseConV.png)
+    
+    ![PointWiseConV](Images/PointWiseConV.png)
+
 - สรุป: **ถูกและเบา** → เหมาะกับ mobile network (MobileNet, Xception)
 
 ---
@@ -147,7 +168,7 @@
 - **HRNet (High-Resolution Network)**
     - เก็บ high-resolution feature ตลอด network (ไม่ใช่ downsample อย่างเดียว)
     - มี parallel branches หลาย resolution แล้ว fuse กันหลายครั้ง
-    - ดีมากสำหรับงานที่ต้องการ boundary ละเอียด เช่น segmentation / pose estimation
+    - ดีมากสำหรับงานที่ต้องการ boundary ละเอียด 
 
 ---
 

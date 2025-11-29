@@ -28,6 +28,8 @@
     - A or B = ทุก pixel ของทั้ง 2 รูปรวมกัน
     - A xor B = ส่วนที่ซ้ำกันเป็น 0
     - NOT A and B = ส่วนที่เป็น A เป็น 0 หมด
+
+    ![LogicOp](Images/LogicOp.png)
 ---
 
 ## 3. Dilation and Erosion
@@ -39,12 +41,16 @@
 - เอา mask ไปแปะถ้าใน mask มี 1 ตำแหน่งนั้นก็จะเป็น 1 สมมติ mask เป็น 3x3 (1 ล้วน) เท่ากับขยายทุก pixel ที่เป็น 1 ในรูป ให้ใหญ่ขึ้น 1 pixel, รูปทรง mask เท่ากับทำให้แต่ละ pixel ทีเป็น 1 กลายเป็นรูปทรงนั้น
 - **Use:** Bridge small gaps and connect objects.
 
+![Dilation](Images/Dilation.png)
+
 ### Erosion (shrinks) : หด
 - Removes pixels from object boundaries.  
 - Formula: A ⊖ B = {z | B_z ⊆ A}  
 - Dual of dilation.
 - เอา mask ไปแปะถ้าใน mask มีตำแหน่งที่ตำแหน่งเป็น 0 จะเป็น 0 สมมติ mask เป็น 3x3 (1 ล้วน) เท่ากับหกทุก pixel ที่เป็น 1 ในรูป ให้เล็กลง 1 pixel, รูปทรง mask เท่ากับทำให้แต่ละ pixel ทีเป็นรูปทรงนั้นเป็น 1 pixel เดี่ยวๆ 
 - **Use:** Remove small noise or irrelevant details.
+
+![Erosion](Images/Erosion.png)
 
 ```python
 erosion = cv2.erode(img, kernel, iterations=1)
@@ -78,12 +84,14 @@ cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
 - Detects specific shapes/patterns.  
 - Formula: A ⊛ B = (A ⊖ B1) ∩ (Aᶜ ⊖ B2)  
 - For finding object B1, B2 = dilated B1
-- (A ⊖ B1) : เพื่อกำหนดอันเล็กกว่า
-- (Aᶜ ⊖ B2) : เพื่อกำหนดอันใหญ่กว่า
+- (A ⊖ B1) : เพื่อกำจัดอันเล็กกว่า
+- (Aᶜ ⊖ B2) : เพื่อกำจัดอันใหญ่กว่า
 - Used for locating defined shapes in binary images.
 - Limitation : 
     - ถ้าภาพมีส่วนที่ซ้อนกันจะหาไม่ได้
     - ต้องรู้ขนาดและรูปทรงแน่นอนของรูปที่จะหา = ถึงสามารถทราบ location ได้
+
+![HitOrMiss](Images/HitOrMiss.png)
 ---
 
 ## 6. Basic Morphological Algorithms
@@ -96,13 +104,20 @@ B(A) = A − (A ⊖ B)
 ### Region Filling
 Xₖ = (Xₖ₋₁ ⨁ B) ∩ Aᶜ : เติมสีในรูป หยุดเมื่อ ไม่มีอะไรเปลี่ยนแล้ว B ใช้เป็น +
 
+![RegionFilling](Images/RegionFilling.png)
+
 ### Connected Components
 Xₖ = (Xₖ₋₁ ⨁ B) ∩ A : หยุดเมื่อไม่มีอะไรเปลี่ยน , หาก B เป็น 3x3 1 ล้วนแปลว่ามองแทยงก็เป็นชิ้นเดียวกันที่เชื่อมกัน
+
+![ConnComp](Images/ConnComp.png)
 
 ### Convex Hull
 -   Smallest convex set containing A, using repeated hit-or-miss transforms.   
     - convex : ขีดเส้นจากจุดใดๆ ในรูปทรงไปอีกจุดในรูปต้องอยู่ในรูปทรง 100 %
     - มี 4 รูปทรงที่ต้องหา แล้วเอามารวมกัน 
+
+![ConvexHull](Images/ConvexHull.png)
+
 ---
 
 ## 7. Thinning, Thickening, Skeleton, Pruning
@@ -111,6 +126,8 @@ Xₖ = (Xₖ₋₁ ⨁ B) ∩ A : หยุดเมื่อไม่มีอ�
 Removes outer layers to reduce objects to minimal connected lines.  
 A⨂B = A − (A ⊛ B) แต่ B มี 8 ตัว
 
+![Thinning](Images/Thinning.png)
+
 ### Thickening
 Dual of thinning.  
 A⊙B = A ∪ (A ⊛ B) ใช้ B 8 ตัวเหมือน Thinning
@@ -118,9 +135,13 @@ A⊙B = A ∪ (A ⊛ B) ใช้ B 8 ตัวเหมือน Thinning
 ### Skeleton
 Set of points equidistant from boundaries. Represents shape with minimal information.
 
+![Skeleton](Images/Skeleton.png)
 ### Pruning
-Removes small spurs left after thinning/skeletonization.
+- Removes small spurs left after thinning/skeletonization.
     - thinning ออกก่อนแล้วค่อยเอา endpoint มา dilation ก่อนจะ union กับผลของ thinning
+
+    ![Pruning](Images/Pruning.png)
+    
 ---
 
 ## 8. Grayscale Morphology
