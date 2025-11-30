@@ -77,6 +77,8 @@
     - padding -> คือตัดขอบของ result ออก
     
     ![TConV](Images/TConV.png)
+    
+    ![TConVCal](Images/TConVCal.png)
 ---
 
 ## U-Net

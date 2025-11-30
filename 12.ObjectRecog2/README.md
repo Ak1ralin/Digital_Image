@@ -10,10 +10,14 @@
 
 ### Calculation 
 - Conv2d : params = (input_channel\*output_channel\*k_h\*k_w)+output_channel
-    - Every input channel will need #output_channel kernels -> (input_channel\*output_channel\*k_h\*k_w)
+    - Every output_channel kernels need #input_channel sub-kernels -> (input_channel\*output_channel\*k_h\*k_w)
     - Each output_channel have 1 bias -> + output_channel
-    - `output_channel = sum_over_channels(convolution_results) + bias_for_this_filter`
-    
+
+    ![ConV](Images/ConV.png) 
+
+    ![ConVCal](Images/ConVCal.png)
+
+    ![ConVProof](Images/ConVProof.png)
 ### Filters
 
 -   CNN filters uncover what each layer learns.
@@ -50,6 +54,8 @@ transforms.Compose([
 
 -   Early CNN for digits.
 
+![LeNet](Images/LeNet.png)
+
 ### ImageNet & ILSVRC
 
 -   14M+ images; benchmark challenge.
@@ -57,7 +63,9 @@ transforms.Compose([
 ### AlexNet (2012)
 
 -   Top-5 error: 15.3%
--   ReLU, dropout, data augmentation.
+-   MaxPooling, ReLU, dropout, data augmentation.
+
+![AlexNet](Images/AlexNet.png)
 
 ### GoogLeNet/Inception (2014)
 
@@ -68,6 +76,8 @@ transforms.Compose([
         - 1x1 Convo -> 3x3 Convo -> use 1x1 first to reduce number of params
         - 1x1 Convo -> 5x5 Convo -> use 1x1 first to reduce number of params
         - Maxpooling -> 1x1 Convo -> to ensure same output_channel with others
+        
+    ![Inception](Images/Inception.png)
 -   1×1 conv (Depth-wise Convo)-> reduce number of channel
     - 256 input_channel with 3x3 kernel ConVo = 256x3x3 + 1(bias) = 2305 params per filter (output_channel) = 2305 x 32 = 73760
     - use 1x1 conv we can reduce number of input_channel 
@@ -86,8 +96,11 @@ transforms.Compose([
     - shortcut(x) มาจาก skip connection
         - **Identity**: ใช้เมื่อ spatial size และจำนวน channel เท่ากัน → บวกตรงได้
         - **1×1 Conv Shortcut**: ใช้เมื่อขนาดหรือ channel ไม่เท่ากัน → ปรับด้วย `Conv1×1` (และ BN) + `stride` ให้ขนาด match ก่อนบวก
+    
+    ![SkipConn](Images/SkipConn.png)
 - BottleNeck Block แทนที่จะใช้ Convo แปลงตรงๆ , ใช้ 1x1 Convo ครอบก่อนจะทำให้ใช้ params ลดลงมาก, ได้ depth กว่ามากเมื่อใช้ params จำนวนใกล้กัน
 
+    ![BottleNeck](Images/BottleNeck.png)
 - ResNet50 much better than ResNet34, while params is closer -> because ResNet50 have BottleNeck Block
 
 ### ResNeXt (2017)
@@ -105,12 +118,13 @@ transforms.Compose([
 
     - **Grouped Convolution**
     - แบ่ง channels เป็นหลายกลุ่ม แล้วคำนวณแยกกัน
-        - group1: `oc1 = ReLU(BN( ic1 * k1 + ic2 * k2))`
-        - group2: `oc3 = ReLU(BN( ic3 * k3 + ic4 * k4))`
+        - group1: `oc1 = ReLU(BN( ic1Convk1 + ic2Convk2))`
+        - group2: `oc3 = ReLU(BN( ic3Convk3 + ic4Convk4))`
         - → **oc1 ไม่ได้ข้อมูลจากทุก channel แต่เฉพาะกลุ่มของมัน**
     - ข้อดี: params ลดลง, ได้หลาย “แบบของ feature” พร้อมกัน  
         (หัวใจของ ResNeXt คือเพิ่ม cardinality = จำนวน group)
 
+    ![GroupConV](Images/GroupConV.png)
 - Group Convolution ดียังไง
     - Conv ปกติ: ทุก output channel ต้องคุยกับทุก input channel → params เยอะมาก
     - Grouped Conv: แบ่ง input channels เป็นหลายกลุ่ม → ทุก group ประมวลผลแยกกัน → แล้วค่อย merge
@@ -166,6 +180,8 @@ transforms.Compose([
         - We have image--text pairs so diagonal should be highest
         - loss-function & backprop -> should make diagonal be highest 
         - make image and text encoder that will give similar vector for similar pair.
+        
+    ![CLIP](Images/CLIP.png)
 
 ## Transfer Learning
 

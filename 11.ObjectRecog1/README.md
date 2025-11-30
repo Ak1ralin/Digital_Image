@@ -28,31 +28,37 @@ Object recognition = identifying objects in images using patterns + features.
 - Steps:
   1. Color normalization (Gamma Equalization), (optional) 
   2. Gradient computation (Get Edge & Direction)
-    - Gx = [-1 0 1] 
-    - Gy = [-1 0 1]^T 
-    - Direction = $tan^-1(\frac{Gy}{Gx})$
-    - Magnitude = $\sqrt{Gx^2 + Gy^2}$
+      - Gx = [-1 0 1] 
+      - Gy = [-1 0 1]^T 
+      - Direction = $tan^-1(\frac{Ry}{Rx})$
+      - Magnitude = $\sqrt{Rx^2 + Ry^2}$
   3. Cell histograms : Partition to non-overlapping cell -> calculate HOG
-    - Weigted Vote
-      - Pixel D  
-        - Angle = **26.6°** (between 20° and 40°)  
-        - Magnitude = **8.94**
-        - Distances  
-          - to 20°: 6.6  
-          - to 40°: 13.4  
-          - interval = 20
-        - Weights
-          - w_20° = 13.4 / 20 = 0.67 : weight for 20 
-          - w_40° = 6.6 / 20 = 0.33 : weight for 40
-        - 20° bin → 8.94 × 0.67 = 5.99
-        - 40° bin → 8.94 × 0.33 = 2.95
+      - Weigted Vote
+        - Pixel D  
+          - Angle = **26.6°** (between 20° and 40°)  
+          - Magnitude = **8.94**
+          - Distances  
+            - to 20°: 6.6  
+            - to 40°: 13.4  
+            - interval = 20
+          - Weights
+            - w_20° = 13.4 / 20 = 0.67 : weight for 20 
+            - w_40° = 6.6 / 20 = 0.33 : weight for 40
+          - 20° bin → 8.94 × 0.67 = 5.99
+          - 40° bin → 8.94 × 0.33 = 2.95
+
+      ![HOG1](Images/HOG1.png)
+
   4. Construct overlap block  
   5. Concatenate Block → feature vector = #block * block_size * #bin  
+
+  ![HOG2](Images/HOG2.png)
 
 ## Neural Networks
 Perceptron: `y = f(Wx + b)`  
 Activation (initially used a binary threshold):
   - ReLU : f(x) = max(x,0) 
+
 Perceptron -> Multilayer Perceptron (MLP) is most basic Neural Network
 
 ## Training Workflow
@@ -114,14 +120,20 @@ Optimizer uses those gradients to update the weights efficiently.
 - Convolution: Extract features by sliding filters to detect edges, textures, and patterns.
   - Depth : depend on input image depth, 3 for RGB 1 for Gray
   - Stride : #pixel when shift kernel
-  - Padding : How to handle out of image pixel 
+  - Padding : How to handle out of image pixel
+  
+  ![ConV](Images/ConV.png) 
+
 - Pooling: Downsample feature maps to reduce size and keep important information.
   - Max Pool : Choose max from area
+
+  ![MaxPool](Images/MaxPool.png)
 - Fully Connected: Standard neural network layers for final classification or prediction.
   - #params = (#input * #output) + #output = (#input + 1) * #output
     -  Every input (x) connect with output -> so have weight(W) for each connection
     - Every output-node have Bias (b) so have to plus #output
 
+  ![FC](Images/FC.png)
 ## Improving Generalization
 - Dropout
     - Purpose: Reduce overfitting.
