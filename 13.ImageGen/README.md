@@ -20,25 +20,27 @@
 ## VAE
 
 โครงสร้าง: encoder–decoder เหมือน autoencoder แต่เป็นแบบ probabilistic
-
 - Encoder:
-  - รับภาพ x แล้วแปลงเป็นพารามิเตอร์ของ Gaussian: μ(x), log σ²(x)
-  - นิยาม q(z|x) = N(μ(x), σ²(x) I)
-  - ใช้ reparameterization trick: z = μ + σ ⊙ ε, ε ~ N(0, I)
+  - มองภาพต้นฉบับ (x) แล้วแปลงเป็น "คำอธิบาย" z 
+    - ความพิเศษของ VAE: แทนที่จะบอกเป๊ะๆ ว่า "ตาสีฟ้า, จมูกยาว 3 ซม." (ซึ่งคือ Autoencoder ธรรมดา) เขาจะบอกเป็น "ช่วงความน่าจะเป็น" Gaussian: μ(x), log σ²(x) เช่น "ตาน่าจะสีฟ้านะ, จมูกยาวประมาณ 2-4 ซม."  
+  - นิยาม q(z|x) = N(μ(x), σ²(x) I), z ที่เกิดจาก x จะอยู่ในช่วง q
+  - ใช้ reparameterization trick: z = μ + σ ⊙ ε, ε ~ N(0, I), สุ่มแค่ ε เพื่อให้สามารถคำนวณย้อนกลับตอน training
 - Decoder:
-  - รับ z แล้ว reconstruct ภาพ ŷ (approx x)
+  - รับ "คำอธิบาย" z แล้วพยายามวาดภาพออกมาใหม่ ($\hat{y}$) ให้เหมือนต้นฉบับ x ที่สุด
+
+![VAE](Images/VAE.png)
 
 ### Loss
 
 - Reconstruction loss: วัดความต่างระหว่าง x กับ ŷ (เช่น MSE, L1, บางงานใช้ SSIM)
-- KL divergence: D_KL(q(z|x) || N(0, I)) เพื่อบังคับให้ latent ใกล้ Gaussian prior
+- KL divergence: D_KL(q(z|x), N(0, I)) เพื่อบังคับให้ latent ใกล้ Gaussian prior
 
 รวม ๆ:   L = ReconLoss(x, ŷ) + KL(q(z|x) || N(0, I))
 
 ### การ generate ภาพ
 
 - ตอน generate ไม่ต้องมีภาพ x
-- สุ่ม z ~ N(0, I) จาก prior แล้วส่งเข้า Decoder → ได้ภาพใหม่ที่สมเหตุสมผลใน data manifold
+- สุ่ม z จาก prior ~ N(0, I) แล้วส่งเข้า Decoder → ได้ภาพใหม่ที่สมเหตุสมผลใน data manifold
 
 **ปรับปรุงที่เจอบ่อย**
 
@@ -61,10 +63,12 @@
 - **Generator G(z)** – Decoder, รับ noise z (Gaussian Space) → สร้างภาพปลอม, คล้าย VAE
 - **Discriminator D(x)** – Encoder, ดูว่าภาพเป็น real(จาก data) หรือ fake(จาก G), classification model
 
+![GAN](Images/GAN.png)
+
 ### Training
 เกม min–max:
 - เมื่อ 0 = fake, 1 = real
-- D พยายามแยก real/fake ให้ดี → maximize log D(real) + log(1−D(fake))
+- D พยายามแยก real/fake → maximize log D(real) + log(1−D(fake))
 - G พยายามหลอก D → minimize log(1−D(fake)) หรือ maximize log D(fake), recommend maximize log D(fake) เพราะไม่งั้น D กับ G จะมีจุดประสงค์ชนกัน
 
 D(x) ใช้ loss ส่วนใหญ่เป็น **binary cross-entropy**
@@ -87,6 +91,8 @@ D(x) ใช้ loss ส่วนใหญ่เป็น **binary cross-entropy*
 ## DCGAN (Deep Convolution GAN)
 ก็แค่เปลี่ยนให้ model ใช้ Convolution แทน
 
+![DCGAN](Images/DCGAN.png)
+
 ### Generator
 
 - Input: noise z (เช่น ขนาด 128)
@@ -99,7 +105,7 @@ D(x) ใช้ loss ส่วนใหญ่เป็น **binary cross-entropy*
 
 ### Discriminator
 
-- Input: ภาพ `nc × 64 × 64`
+- Input: ภาพ `in_ch × 64 × 64`
 - Stack ของ:
   - `Conv2d` (downsample)
   - `BatchNorm2d`
@@ -176,6 +182,7 @@ Train สลับ D -> G -> D
     - ใช้ **MSE loss** ระหว่าง real_noise vs pred_noise -> ทำ improve ความสามารถในการ predict noise จาก x_n
     - ไปจนถึง \(x_0\) → เป็นภาพใหม่ที่ sample มาจาก data distribution
 
+![DDPM](Images/DDPM.png)
 ---
 
 ## Latent Diffusion & Stable Diffusion
@@ -190,6 +197,8 @@ Step :
 - ใช้ U-Net เป็น core denoiser : เหมือนเดิม
   - ใส่ text condition ผ่าน text encoder (เช่น Transformer) + cross-attention
 - ได้ latent จาก U-net ผ่าน decoder -> เป็นภาพ
+
+![StableDif](Images/StableDif.png)
 
 ---
 
