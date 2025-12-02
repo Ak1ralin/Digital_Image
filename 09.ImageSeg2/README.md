@@ -33,18 +33,18 @@
 
 - ใช้วัด overlap ของ prediction กับ ground-truth, Strict ค่ามักต่ำ แต่ค่อนข้างเป็น Standard
 - สูตร:  
-  $$ 
+  $ 
   \text{IoU} = \frac{A \cap B}{A \cup B} = \frac{TP}{TP + FP + FN} 
-  $$
-- ถ้า BG มี precentage เยอะก็ตอบให้เป็น BG หมดก็จบ -> IoU ก็โอเค เพราะ FP,FN มันมีนิดเดียว
+  $
+- ถ้า BG มี percentage เยอะก็ตอบให้เป็น BG หมดก็จบ -> IoU ก็ดูไม่แย่ เพราะ FP,FN (ส่วนที่เป็น object) มันมีนิดเดียว
 ### Dice Score
 
 - คล้าย IoU แต่ให้ความสำคัญ **คำตอบที่ถูก** มากขึ้น เพิ่ม weight ทำให้ได้คะแนนสูง
 - สูตร:
-  $$ 
+  $ 
   \text{Dice} = \frac{2TP}{2TP + FP + FN} 
-  $$
-- ในงาน segmentation มักใช้ **Dice loss = 1 – Dice score**  
+  $
+- ในงาน segmentation มักใช้ **Dice loss = 1 – Dice score** เป็น loss-function
   → บังคับให้ mask ทับกันเยอะ ๆ
 
 **ทั้ง IoU และ Dice สุดท้ายจะใช้เป็น mean ของทุก class, โดยกำหนด each class เป็น Positive, หรือเอาเฉพาะอันที่สนใจเช่น object = positive**
@@ -98,7 +98,7 @@
 
 - ใช้ **สอง loss รวมกัน** เพื่อให้ training stable:
     - **DiceLoss (1 - Dice-Score) : focus pixel**
-        - เน้นให้ overlap ระหว่าง prediction mask กับ GT สูง
+        - เน้นให้ overlap ระหว่าง prediction mask กับ Ground Truth สูง
         - ดีมากเวลา class positive น้อย (object เล็ก ๆ)
     - **BCEWithLogitsLoss : focus class**
         - รวม Sigmoid + Binary Cross Entropy ในตัวเดียว เสถียรกว่าใช้ Sigmoid แล้วค่อย BCE แยกกัน
