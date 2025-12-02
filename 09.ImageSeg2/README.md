@@ -33,13 +33,17 @@
 
 - ใช้วัด overlap ของ prediction กับ ground-truth, Strict ค่ามักต่ำ แต่ค่อนข้างเป็น Standard
 - สูตร:  
-  $$ IoU = \frac{A \cap B}{A \cup B} = \frac{TP}{TP + FP + FN} $$
+  $$ 
+  \text{IoU} = \frac{A \cap B}{A \cup B} = \frac{TP}{TP + FP + FN} 
+  $$
 - ถ้า BG มี precentage เยอะก็ตอบให้เป็น BG หมดก็จบ -> IoU ก็โอเค เพราะ FP,FN มันมีนิดเดียว
 ### Dice Score
 
 - คล้าย IoU แต่ให้ความสำคัญ **คำตอบที่ถูก** มากขึ้น เพิ่ม weight ทำให้ได้คะแนนสูง
 - สูตร:
-  $$ Dice = \frac{2TP}{2TP + FP + FN} $$
+  $$ 
+  \text{Dice} = \frac{2TP}{2TP + FP + FN} 
+  $$
 - ในงาน segmentation มักใช้ **Dice loss = 1 – Dice score**  
   → บังคับให้ mask ทับกันเยอะ ๆ
 
