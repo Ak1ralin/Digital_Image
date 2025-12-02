@@ -1,6 +1,8 @@
 # Guest Speaker: The Rapid Evolution of AI
-
-### Summary
+## Summary 
+- Guest speaker defines AI as a "collaborator", highlighting rapid growth in intelligence, efficiency and costs, mention newest model win ICPC, Reasoning Better, Multimodal, Open/Close comparison, noting that jobs will evolve rather than disappear. Future roles will prioritize system orchestration over manual coding. To adapt, the speaker advises individuals to  practice constantly. Success requires treating AI as a "hammer" to solve real-world "nails," remaining curious, and critically auditing results to navigate this fast-paced landscape.
+---
+### Outline
 The guest deliver a great talk about the rapid evolution of AI, from the perspective of a Google employee. The speaker discusses AI’s fast-paced advancements, current trends, potential impacts on jobs and society, and offers practical advice for individuals to adapt. The talk is structured in three main acts:
 
 1. **Act I: The Relentless Progress of AI**

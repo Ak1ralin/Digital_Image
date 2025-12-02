@@ -82,6 +82,9 @@
     ![TConV](Images/TConV.png)
     
     ![TConVCal](Images/TConVCal.png)
+
+    - padding: Removes (crops) data from the output.
+    - output_padding: Adds (fills) data to the output.
 ---
 
 ## U-Net
