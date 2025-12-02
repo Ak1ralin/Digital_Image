@@ -11,7 +11,6 @@
     - แนวโน้ม model ปัจจุบัน (ONE-PEACE, InternImage, BEiT-3, EVA ฯลฯ)
 
 ---
-
 ## Types of Modern Segmentation
 
 - **Semantic segmentation : นับไม่ได้**
